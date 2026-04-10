@@ -16,11 +16,11 @@ function JobDetails() {
 
   const handleSave = () => {
     let saved = JSON.parse(localStorage.getItem("savedJobs")) || [];
-
     if (!saved.find((j) => j._id === job._id)) {
       saved.push(job);
       localStorage.setItem("savedJobs", JSON.stringify(saved));
     }
+    console.log(saved)
 
     alert("Saved ✅");
   };
