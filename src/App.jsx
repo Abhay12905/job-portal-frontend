@@ -10,7 +10,7 @@ import AppliedJobs from "./Pages/AppliedJobs";
 import Settings from "./Pages/Settings";
 import protectedRoutes from "./Utils/protectedRoutes";
 import Addjob from "./Pages/Addjob";
-import JobDetails from "./Pages/Jobdetails";
+import JobDetails from "./Pages/JobDetails"
 function App() {
   return (
     <Routes>
