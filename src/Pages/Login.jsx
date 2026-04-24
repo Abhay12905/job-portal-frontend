@@ -26,9 +26,15 @@ function Login() {
      withCredentials: true
 });
     // console.log(res.headers.authorization)
-      const token = res.headers.authorization.split(" ")[1];
+     const token =
+  res.data.accessToken ||
+  res.headers.authorization?.split(" ")[1];
 
-      localStorage.setItem("accessToken", token);
+if (!token) {
+  throw new Error("Token not received");
+}
+
+localStorage.setItem("accessToken", token);
 
       alert("Login Successful ");
 

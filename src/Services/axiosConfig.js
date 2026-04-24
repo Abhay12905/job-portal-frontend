@@ -1,65 +1,52 @@
 import axios from "axios";
 
+const BASE_URL = "https://job-portal-backend-et0n.onrender.com/api";
+
 export const api = axios.create({
-  baseURL: "https://job-portal-backend-et0n.onrender.com/api/",
+  baseURL: BASE_URL,
   withCredentials: true,
 });
 
-// REQUEST
+// REQUEST INTERCEPTOR
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
 
   if (token) {
-    config.headers["Authorization"] = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
   return config;
 });
 
+// RESPONSE INTERCEPTOR (FIXED)
 api.interceptors.response.use(
-  (response) => response,
-
+  (res) => res,
   async (error) => {
-
-    console.log("❌ Interceptor Error:", error.response?.status);
-
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-
       originalRequest._retry = true;
 
       try {
-
-        console.log("🔁 Calling refresh API");
-
         const res = await axios.post(
-          "http://localhost:3000/api/user/refreshToken",
+          `${BASE_URL}/user/refreshToken`,
           {},
           { withCredentials: true }
         );
 
-        const newAccessToken =
-          res.headers.authorization?.split(" ")[1];
+        // ✅ FIX: get token from header OR body
+        const newToken =
+          res.headers["authorization"]?.split(" ")[1] ||
+          res.data.accessToken;
 
-        console.log("✅ New Token:", newAccessToken);
-
-        localStorage.setItem("accessToken", newAccessToken);
-
-        originalRequest.headers["Authorization"] =
-          `Bearer ${newAccessToken}`;
-
-        return api(originalRequest);
-
-      } catch (refreshError) {
-
-        console.log("🚨 Refresh FAILED");
-
+        if (newToken) {
+          localStorage.setItem("accessToken", newToken);
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return api(originalRequest);
+        }
+      } catch (err) {
         localStorage.removeItem("accessToken");
-
         window.location.href = "/login";
-
-        return Promise.reject(refreshError);
       }
     }
 

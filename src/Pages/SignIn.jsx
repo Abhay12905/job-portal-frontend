@@ -20,38 +20,34 @@ function SignIn() {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const res = await axios.post(
-        "http://localhost:3000/api/user/createUser",
-        formData
-      );
-      localStorage.setItem("email", formData.email)
-      console.log(res);
-      alert(res.data.message);
+  try {
+    const res = await api.post("/user/createUser", formData);
 
-      // 🔥 Fix: keep role lowercase to match radio
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        phone: "",
-        role: "employee",
-      });
+    localStorage.setItem("email", formData.email);
 
-      navigate("/otp");
+    alert(res.data.message);
 
-    } catch (error) {
-      if (error.response) {
-        alert(error.response.data.message);
-      } else {
-        alert("Something went wrong");   // 🔥 Fix: remove res.data.msg
-      }
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      phone: "",
+      role: "employee",
+    });
+
+    navigate("/otp");
+
+  } catch (error) {
+    if (error.response) {
+      alert(error.response.data.message);
+    } else {
+      alert("Server not reachable");
     }
-  };
-
+  }
+};
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-700 to-indigo-600 p-4">
       <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden lg:grid lg:grid-cols-2">
